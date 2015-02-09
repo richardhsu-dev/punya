@@ -476,11 +476,9 @@ public class DesignToolbar extends Toolbar {
   private class ChangeSettingsAction implements Command {
     @Override
     public void execute() {
-    ProjectRootNode projectRootNode = Ode.getInstance().getCurrentYoungAndroidProjectRootNode();
-    Project p = Ode.getInstance().getProjectManager().getProject(projectRootNode);
-    new SettingsEditor(p).show();
+    	ProjectRootNode projectRootNode = Ode.getInstance().getCurrentYoungAndroidProjectRootNode();
+    	Project p = Ode.getInstance().getProjectManager().getProject(projectRootNode);
+    	new SettingsEditor(p).show();
     }
-}
-
-
+  }
 }

@@ -21,6 +21,9 @@ public class SettingsEditor extends DialogBox {
 
   public SettingsEditor(Project project) {
     this.project = project;
+    this.setStylePrimaryName("ode-DialogBox");
+    this.setText("Google Maps Setting");
+    
     mapsKeyField = new TextBox();
     Label label = new Label("Google Maps API Key:");
     VerticalPanel panel2 = new VerticalPanel();
@@ -61,7 +64,6 @@ public class SettingsEditor extends DialogBox {
     this.add(panel2);
     this.setWidth("100%");
     this.setHeight("70%");
-    this.addStyleName("ode-DialogBox");
     this.center();
     init();
   }
@@ -74,14 +76,12 @@ public class SettingsEditor extends DialogBox {
 
   protected void saveSettings() {
     Settings settings = project.getSettings().getSettings(SettingsConstants.PROJECT_YOUNG_ANDROID_SETTINGS);
-
     String currentValue = settings.getPropertyValue(SettingsConstants.YOUNG_ANDROID_SETTINGS_MAPS_KEY);
     String newValue = mapsKeyField.getText();
     if (!newValue.equals(currentValue)) {
       settings.changePropertyValue(SettingsConstants.YOUNG_ANDROID_SETTINGS_MAPS_KEY, newValue);
       Ode.getInstance().getEditorManager().scheduleAutoSave(project.getSettings());
     }
-
     this.hide(true);
   }
 }

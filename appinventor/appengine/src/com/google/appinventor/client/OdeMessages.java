@@ -5184,15 +5184,15 @@ public interface OdeMessages extends Messages {
   @Description("")
   String GetRowsWithConditionsMethods();
 
-  @DefaultMessage("简体中文")
+  @DefaultMessage("������������")
   @Description("")
   String SwitchToSimplifiedChinese();
 
-  @DefaultMessage("繁体中文")
+  @DefaultMessage("������������")
   @Description("")
   String SwitchToTraditionalChinese();
 
-  @DefaultMessage("Español")
+  @DefaultMessage("Espa��ol")
   @Description("")
   String SwitchToSpanish();
   
