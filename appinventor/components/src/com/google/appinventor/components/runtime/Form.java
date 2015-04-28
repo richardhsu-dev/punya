@@ -43,6 +43,7 @@ import android.widget.FrameLayout;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
+
 import com.google.appinventor.components.annotations.DesignerComponent;
 import com.google.appinventor.components.annotations.DesignerProperty;
 import com.google.appinventor.components.annotations.PropertyCategory;
@@ -721,6 +722,12 @@ public class Form extends FragmentActivity
     if (backgroundDrawable != null) {
       ViewUtil.setBackgroundImage(frameLayout, backgroundDrawable);
     }
+/*      Modification for smaller screens
+**      BoxInsetLayout base = new BoxInsetLayout(this);BoxInsetLayout.LayoutParams lp = new BoxInsetLayout.LayoutParams(BoxInsetLayout.LayoutParams.MATCH_PARENT,BoxInsetLayout.LayoutParams.MATCH_PARENT);
+**      lp.boxedEdges = BoxInsetLayout.LayoutParams.BOX_ALL;
+**      base.addView(frameLayout,lp);
+**      setContentView(base);
+*/
     setContentView(frameLayout);
     frameLayout.requestLayout();
   }
@@ -817,7 +824,7 @@ public class Form extends FragmentActivity
       defaultValue = "")
   @SimpleProperty
   public void Title(String title) {
-    setTitle(title);
+    //setTitle(title);
   }
 
 

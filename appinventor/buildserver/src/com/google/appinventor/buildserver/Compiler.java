@@ -23,6 +23,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -56,7 +57,8 @@ import javax.imageio.ImageIO;
 public final class Compiler {
   public static int currentProgress = 10;
 
-  // Kawa and DX processes can use a lot of memory. We only launch one Kawa or DX process at a time.
+
+    // Kawa and DX processes can use a lot of memory. We only launch one Kawa or DX process at a time.
   private static final Object SYNC_KAWA_OR_DX = new Object();
 
   private static final String SWLIST_ACTIVITY_CLASS =
@@ -111,8 +113,12 @@ public final class Compiler {
   private static final String COMPONENT_BUILD_INFO =
       RUNTIME_FILES_DIR + "simple_components_build_info.json";
 
+    private static final String WEAR_APK_FILE_NAME =
+            "wearable_app.apk";
 
-  /*
+
+
+    /*
    * Resource paths to yail runtime, runtime library files and sdk tools.
    * To get the real file paths, call getResource() with one of these constants.
    */
@@ -182,6 +188,9 @@ public final class Compiler {
   private static final String COMPILATION_ERROR =
       "Error: Your build failed due to an error when compiling %s.\n";
 
+    public enum BUILD_TYPE{
+        PHONE,PHONE_WITH_WEAR,PHONE_FOR_WEAR,WEAR
+    }
   private final Project project;
   private final Set<String> componentTypes;
   private final PrintStream out;
@@ -196,9 +205,11 @@ public final class Compiler {
   private Set<String> assetsNeeded; // Set of component assets
   private File libsDir; // The directory that will contain any native libraries for packaging
   private String dexCacheDir;
+    private  BUILD_TYPE buildType;
 
 
-  /*
+
+    /*
    * Generate the set of Android permissions needed by this project.
    */
   @VisibleForTesting
@@ -322,6 +333,7 @@ public final class Compiler {
     // Before we can use componentAssets, we have to call loadJsonInfo() for assets.
     try {
       loadJsonInfo(componentAssets, ASSETS_TARGET);
+
     } catch (IOException e) {
       // This is fatal.
       e.printStackTrace();
@@ -349,7 +361,7 @@ public final class Compiler {
   /*
    * Creates an AndroidManifest.xml file needed for the Android application.
    */
-  private boolean writeAndroidManifest(File manifestFile, Set<String> permissionsNeeded) {
+  private boolean writeAndroidManifest(File manifestFile, Set<String> permissionsNeeded,BUILD_TYPE buildType) {
     // Create AndroidManifest.xml
     String mainClass = project.getMainClass();
     String packageName = Signatures.getPackageName(mainClass);
@@ -375,12 +387,13 @@ public final class Compiler {
          "android:versionCode=\"" + vCode +"\" " + "android:versionName=\"" + vName + "\" " +
           ">\n");
 
+        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++"+vCode+"++++"+vName+"++++");
       // If we are building the Wireless Debugger (AppInventorDebugger) add the uses-feature tag which
       // is used by the Google Play store to determine which devices the app is available for. By adding
       // these lines we indicate that we use these features BUT THAT THEY ARE NOT REQUIRED so it is ok
       // to make the app available on devices that lack the feature. Without these lines the Play Store
       // makes a guess based on permissions and assumes that they are required features.
-      if (isForCompanion) {
+      if (buildType!=BUILD_TYPE.WEAR && isForCompanion) {
           out.write("  <uses-feature android:name=\"android.hardware.bluetooth\" android:required=\"false\" />\n");
           out.write("  <uses-feature android:name=\"android.hardware.location\" android:required=\"false\" />\n");
           out.write("  <uses-feature android:name=\"android.hardware.telephony\" android:required=\"false\" />\n");
@@ -389,40 +402,41 @@ public final class Compiler {
           out.write("  <uses-feature android:name=\"android.hardware.microphone\" android:required=\"false\" />\n");
           out.write("  <uses-feature android:name=\"android.hardware.touchscreen\" android:required=\"false\" />\n");
           out.write("  <uses-feature android:name=\"android.hardware.wifi\" />\n"); // We actually require wifi
-      }
 
-      for (String permission : permissionsNeeded) {
-        out.write("  <uses-permission android:name=\"" + permission + "\" />\n");
       }
-
+        if(buildType!=BUILD_TYPE.WEAR) {
+            for (String permission : permissionsNeeded) {
+                out.write("  <uses-permission android:name=\"" + permission + "\" />\n");
+            }
+        }
       
       // Google Cloud Messaging
-      if (componentTypes.contains("GoogleCloudMessaging")|| componentTypes.contains("PctMessaging")){
+      if (buildType!=BUILD_TYPE.WEAR && (componentTypes.contains("GoogleCloudMessaging")|| componentTypes.contains("PctMessaging"))){
     	  out.write("<permission android:name=\"com.google.appinventor.aiphoneapp.permission.C2D_MESSAGE\" android:protectionLevel=\"signature\" />\n");
     	  out.write("<uses-permission android:name=\"com.google.appinventor.aiphoneapp.permission.C2D_MESSAGE\" />\n"); 
             
     	  out.write("<permission android:name=\"" + packageName +".permission.C2D_MESSAGE\" android:protectionLevel=\"signature\" />\n");
-    	  out.write("<uses-permission android:name=\""+ packageName +".permission.C2D_MESSAGE\" />\n"); 
+    	  out.write("<uses-permission android:name=\""+ packageName +".permission.C2D_MESSAGE\" />\n");
       }
       
       
       // add permission, and uses-permission, uses-feature specifically for Google Map
       // as stated here https://developers.google.com/maps/documentation/android/start
-      if (componentTypes.contains("GoogleMap")){
+      if (buildType!=BUILD_TYPE.WEAR  && componentTypes.contains("GoogleMap")){
           out.write(" <permission ");
           out.write(" android:name=\"" + packageName +".permission.MAPS_RECEIVE\" ");
           out.write(" android:protectionLevel=\"signature\" /> \n");
           out.write(" <uses-permission android:name=\"" + packageName + ".permission.MAPS_RECEIVE\" />\n");
           out.write(" <uses-feature android:glEsVersion=\"0x00020000\" android:required=\"true\" />\n");
       }
-      
+
 
       // TODO(markf): Change the minSdkVersion below if we ever require an SDK beyond 1.5.
       // The market will use the following to filter apps shown to devices that don't support
       // the specified SDK version.  We might also want to allow users to specify minSdkVersion
       // or have us specify higher SDK versions when the program uses a component that uses
       // features from a later SDK (e.g. Bluetooth).
-      out.write("  <uses-sdk android:minSdkVersion=\"3\" />\n");
+      out.write("  <uses-sdk android:minSdkVersion=\"19\" />\n");
 
       // If we set the targetSdkVersion to 4, we can run full size apps on tablets.
       // On non-tablet hi-res devices like a Nexus One, the screen dimensions will be the actual
@@ -433,7 +447,7 @@ public final class Compiler {
       // this problem, but images and buttons are still an unsolved problem. We'll have to solve
       // that before we can set the targetSdkVersion to 4 here.
 
-      // out.write("  <uses-sdk android:targetSdkVersion=\"4\" />\n");
+       out.write("  <uses-sdk android:targetSdkVersion=\"20\" />\n");
       // out.write("  <uses-sdk android:targetSdkVersion=\"8\" />\n");
 
 
@@ -448,12 +462,18 @@ public final class Compiler {
       out.write("android:debuggable=\"false\" ");
       out.write("android:label=\"" + projectName + "\" ");
       out.write("android:icon=\"@drawable/ya\" ");
-      if (isForCompanion) {              // This is to hook into ACRA
-        out.write("android:name=\"com.google.appinventor.components.runtime.ReplApplication\" ");
-      }
-      out.write(">\n");
+        out.write("android:theme=\"@android:style/Theme.DeviceDefault\" ");
 
-      for (Project.SourceDescriptor source : project.getSources()) {
+        if (buildType!=BUILD_TYPE.WEAR && isForCompanion) {              // This is to hook into ACRA
+            out.write("android:name=\"com.google.appinventor.components.runtime.ReplApplication\" ");
+        }
+      out.write(">\n");
+        if(buildType==BUILD_TYPE.PHONE_WITH_WEAR){
+            out.write("<meta-data android:name='com.google.android.wearable.beta.app' android:resource='@xml/wearable_app_desc'/>");
+        }
+
+
+        for (Project.SourceDescriptor source : project.getSources()) {
         String formClassName = source.getQualifiedName();
         // String screenName = formClassName.substring(formClassName.lastIndexOf('.') + 1);
         boolean isMain = formClassName.equals(mainClass);
@@ -498,7 +518,8 @@ public final class Compiler {
           out.write("        <data android:mimeType=\"text/plain\" />\n");
           out.write("      </intent-filter>\n");
         }
-        out.write("    </activity>\n");
+
+          out.write("    </activity>\n");
       }
 
       // TODO(ewpatton): Provide if statements to conditionally include the following activities
@@ -660,177 +681,244 @@ public final class Compiler {
 	  // Close the application tag
       out.write("  </application>\n");
       out.write("</manifest>\n");
-      out.close();
+        String s = null;
+
+        out.close();
     } catch (IOException e) {
       e.printStackTrace();
       userErrors.print(String.format(ERROR_IN_STAGE, "manifest"));
       return false;
     }
-
     return true;
   }
 
   /**
-   * Builds a YAIL project.
-   *
-   * @param project  project to build
-   * @param componentTypes component types used in the project
-   * @param out  stdout stream for compiler messages
-   * @param err  stderr stream for compiler messages
-   * @param userErrors stream to write user-visible error messages
-   * @param keystoreFilePath
-   * @param childProcessRam   maximum RAM for child processes, in MBs.
-   * @return  {@code true} if the compilation succeeds, {@code false} otherwise
-   * @throws JSONException
-   * @throws IOException
-   */
-  public static boolean compile(Project project, Set<String> componentTypes,
-                                PrintStream out, PrintStream err, PrintStream userErrors,
-                                boolean isForCompanion, String keystoreFilePath,
-                                int childProcessRam, String dexCacheDir) throws IOException, JSONException {
-    long start = System.currentTimeMillis();
+     * Builds a YAIL project.
+     *
+     * @param project  project to build
+     * @param componentTypes component types used in the project
+     * @param out  stdout stream for compiler messages
+     * @param err  stderr stream for compiler messages
+     * @param userErrors stream to write user-visible error messages
+     * @param keystoreFilePath
+     * @param childProcessRam   maximum RAM for child processes, in MBs.
+     * @return  {@code true} if the compilation succeeds, {@code false} otherwise
+     * @throws JSONException
+     * @throws IOException
+     */
+    public static boolean compile(Project project, Set<String> componentTypes,
+                                  PrintStream out, PrintStream err, PrintStream userErrors,
+                                  boolean isForCompanion, String keystoreFilePath,
+                                  int childProcessRam, String dexCacheDir) throws IOException, JSONException {
+        BUILD_TYPE buildType = BUILD_TYPE.PHONE;
+        return Compiler.compile( project, componentTypes, out, err, userErrors,
+                isForCompanion, keystoreFilePath, childProcessRam, dexCacheDir, buildType,null);
+    }
+    /**
+     * Builds a YAIL project.
+     *
+     * @param project  project to build
+     * @param componentTypes component types used in the project
+     * @param out  stdout stream for compiler messages
+     * @param err  stderr stream for compiler messages
+     * @param userErrors stream to write user-visible error messages
+     * @param keystoreFilePath
+     * @param childProcessRam   maximum RAM for child processes, in MBs.
+     * @param buildType  type of Android project for the outputted APK
+     * @return  {@code true} if the compilation succeeds, {@code false} otherwise
+     * @throws JSONException
+     * @throws IOException
+     */
+    public static boolean compile(Project project, Set<String> componentTypes,
+                                  PrintStream out, PrintStream err, PrintStream userErrors,
+                                  boolean isForCompanion, String keystoreFilePath,
+                                  int childProcessRam, String dexCacheDir,BUILD_TYPE buildType) throws IOException, JSONException {
+        if(buildType==BUILD_TYPE.PHONE_WITH_WEAR){
+            buildType = BUILD_TYPE.PHONE;
+        }
+        return Compiler.compile( project, componentTypes, out, err, userErrors,
+                isForCompanion, keystoreFilePath, childProcessRam, dexCacheDir, buildType,null);
+    }
+    /**
+     * Builds a YAIL project.
+     *
+     * @param project  project to build
+     * @param componentTypes component types used in the project
+     * @param out  stdout stream for compiler messages
+     * @param err  stderr stream for compiler messages
+     * @param userErrors stream to write user-visible error messages
+     * @param keystoreFilePath
+     * @param childProcessRam   maximum RAM for child processes, in MBs.
+     * @param buildType  type of Android project for the outputted APK
+     * @param packagedAPK wear APK for packaged wear app
+     * @return  {@code true} if the compilation succeeds, {@code false} otherwise
+     * @throws JSONException
+     * @throws IOException
+     */
+    public static boolean compile(Project project, Set<String> componentTypes,
+                                  PrintStream out, PrintStream err, PrintStream userErrors,
+                                  boolean isForCompanion, String keystoreFilePath,
+                                  int childProcessRam, String dexCacheDir,BUILD_TYPE buildType,File packagedAPK) throws IOException, JSONException {
+        out.println(buildType);
+        long start = System.currentTimeMillis();
 
-    // Create a new compiler instance for the compilation
-    Compiler compiler = new Compiler(project, componentTypes, out, err, userErrors, isForCompanion,
-                                     childProcessRam, dexCacheDir);
+        // Create a new compiler instance for the compilation
+        Compiler compiler = new Compiler(project, componentTypes, out, err, userErrors, isForCompanion,
+                childProcessRam, dexCacheDir,buildType);
 
-    // Get names of component-required libraries and assets.
-    compiler.generateLibraryNames();
-    compiler.generateNativeLibraryNames();
-    compiler.generateAssets();
-    
-    // TODO: code for copying all neededTemplates from AppEngine's /WEBINF/template to Android asset folder
-    // Move needed templates files to project's asset folder
-     
+        // Get names of component-required libraries and assets.
+        compiler.generateLibraryNames();
+        compiler.generateNativeLibraryNames();
+        compiler.generateAssets();
+
+        // TODO: code for copying all neededTemplates from AppEngine's /WEBINF/template to Android asset folder
+        // Move needed templates files to project's asset folder
+
 //    compiler.generateTemplateNames(); //after this we have all templateNames used by the components in templatesNeeded
 /*    compiler.copyTemplatesToAssets();*/
-    
 
-    // Create build directory.
-    File buildDir = createDirectory(project.getBuildDirectory());
 
-    // Prepare application icon.
-    out.println("________Preparing application icon");
-    File resDir = createDirectory(buildDir, "res");
-    File drawableDir = createDirectory(resDir, "drawable");
-    if (!compiler.prepareApplicationIcon(new File(drawableDir, "ya.png"))) {
-      return false;
+        // Create build directory.
+        File buildDir = createDirectory(project.getBuildDirectory());
+
+        // Prepare application icon.
+        out.println("________Preparing application icon");
+        File resDir = createDirectory(buildDir, "res");
+        File drawableDir = createDirectory(resDir, "drawable");
+        if (!compiler.prepareApplicationIcon(new File(drawableDir, "ya.png"))) {
+            return false;
+        }
+        setProgress(10);
+        //Create raw directory
+        out.println("________Creating raw directory");
+        File rawDir = createDirectory(resDir, "raw");
+        if(buildType==BUILD_TYPE.PHONE_WITH_WEAR && !compiler.attachRawAssets(buildType, rawDir, packagedAPK)){
+            return false;
+        }
+
+        // Create xml directory and desc xml files
+        out.println("________Creating desc xml");
+        File xmlDescDir = createDirectory(resDir, "xml");
+        String mainClass = project.getMainClass();
+        String packageName = Signatures.getPackageName(mainClass);
+        if (buildType==BUILD_TYPE.PHONE_WITH_WEAR && !compiler.createDescXml(xmlDescDir,packageName,project.getVCode(),project.getVName())) {
+            return false;
+        }
+
+        // Create anim directory and animation xml files
+        out.println("________Creating animation xml");
+        File animDir = createDirectory(resDir, "anim");
+        if (!compiler.createAnimationXml(animDir)) {
+            return false;
+        }
+
+
+        // Create fragment directory and fragment xml files
+        out.println("________Creating fragment xml");
+        File fragmentDir = createDirectory(resDir, "layout");
+        if (!compiler.createFragmentXml(fragmentDir)) {
+            return false;
+        }
+
+        // Determine android permissions.
+        out.println("________Determining permissions");
+        Set<String> permissionsNeeded = compiler.generatePermissions();
+        if (permissionsNeeded == null) {
+            return false;
+        }
+        setProgress(15);
+
+        // Generate AndroidManifest.xml
+        out.println("________Generating manifest file");
+        File manifestFile = new File(buildDir, "AndroidManifest.xml");
+        if (!compiler.writeAndroidManifest(manifestFile, permissionsNeeded,buildType)) {
+            return false;
+        }
+        setProgress(20);
+
+        // Insert native libraries
+        out.println("________Attaching native libraries");
+        if (!compiler.insertNativeLibraries(buildDir)) {
+            return false;
+        }
+
+        // Add raw assets to sub-directory of project assets.
+        out.println("________Attaching component assets");
+        if (!compiler.attachComponentAssets()) {
+            return false;
+        }
+
+        // Create class files.
+        out.println("________Compiling source files");
+        File classesDir = createDirectory(buildDir, "classes");
+        if (!compiler.generateClasses(classesDir)) {
+            return false;
+        }
+        setProgress(35);
+
+        // Invoke dx on class files
+        out.println("________Invoking DX");
+        // TODO(markf): Running DX is now pretty slow (~25 sec overhead the first time and ~15 sec
+        // overhead for subsequent runs).  I think it's because of the need to dx the entire
+        // kawa runtime every time.  We should probably only do that once and then copy all the
+        // kawa runtime dx files into the generated classes.dex (which would only contain the
+        // files compiled for this project).
+        // Aargh.  It turns out that there's no way to manipulate .dex files to do the above.  An
+        // Android guy suggested an alternate approach of shipping the kawa runtime .dex file as
+        // data with the application and then creating a new DexClassLoader using that .dex file
+        // and with the original app class loader as the parent of the new one.
+        // TODONE(zhuowei): Now using the new Android DX tool to merge dex files
+        // Needs to specify a writable cache dir on the command line that persists after shutdown
+        // Each pre-dexed file is identified via its MD5 hash (since the standard Android SDK's
+        // method of identifying via a hash of the path won't work when files
+        // are copied into temporary storage) and processed via a hacked up version of
+        // Android SDK's Dex Ant task
+        File tmpDir = createDirectory(buildDir, "tmp");
+        String dexedClasses = tmpDir.getAbsolutePath() + File.separator + "classes.dex";
+        if (!compiler.runDx(classesDir, dexedClasses)) {
+            return false;
+        }
+        setProgress(85);
+
+        // Invoke aapt to package everything up
+        out.println("________Invoking AAPT");
+        File deployDir = createDirectory(buildDir, "deploy");
+        String tmpPackageName = deployDir.getAbsolutePath() + File.separatorChar +
+                project.getProjectName() + ".ap_";
+        if (!compiler.runAaptPackage(manifestFile, resDir, tmpPackageName)) {
+            return false;
+        }
+        setProgress(90);
+
+        // Seal the apk with ApkBuilder
+        out.println("________Invoking ApkBuilder");
+        String apkAbsolutePath = deployDir.getAbsolutePath() + File.separatorChar +
+                project.getProjectName() + ".apk";
+        if (!compiler.runApkBuilder(apkAbsolutePath, tmpPackageName, dexedClasses)) {
+            return false;
+        }
+        setProgress(95);
+
+        // Sign the apk file
+        out.println("________Signing the apk file");
+        if (!compiler.runJarSigner(apkAbsolutePath, keystoreFilePath)) {
+            return false;
+        }
+
+        // ZipAlign the apk file
+        out.println("________ZipAligning the apk file");
+        if (!compiler.runZipAlign(apkAbsolutePath, tmpDir)) {
+            return false;
+        }
+
+        setProgress(100);
+
+        out.println("Build finished in " +
+                ((System.currentTimeMillis() - start) / 1000.0) + " seconds");
+
+        return true;
     }
-    setProgress(10);
 
-    // Create anim directory and animation xml files
-    out.println("________Creating animation xml");
-    File animDir = createDirectory(resDir, "anim");
-    if (!compiler.createAnimationXml(animDir)) {
-      return false;
-    }
-    
-    // Create fragment directory and fragment xml files
-    out.println("________Creating fragment xml");
-    File fragmentDir = createDirectory(resDir, "layout");
-    if (!compiler.createFragmentXml(fragmentDir)) {
-      return false;
-    }
-
-    // Determine android permissions.
-    out.println("________Determining permissions");
-    Set<String> permissionsNeeded = compiler.generatePermissions();
-    if (permissionsNeeded == null) {
-      return false;
-    }
-    setProgress(15);
-
-    // Generate AndroidManifest.xml
-    out.println("________Generating manifest file");
-    File manifestFile = new File(buildDir, "AndroidManifest.xml");
-    if (!compiler.writeAndroidManifest(manifestFile, permissionsNeeded)) {
-      return false;
-    }
-    setProgress(20);
-
-    // Insert native libraries
-    out.println("________Attaching native libraries");
-    if (!compiler.insertNativeLibraries(buildDir)) {
-      return false;
-    }
-
-    // Add raw assets to sub-directory of project assets.
-    out.println("________Attaching component assets");
-    if (!compiler.attachComponentAssets()) {
-      return false;
-    }
-
-    // Create class files.
-    out.println("________Compiling source files");
-    File classesDir = createDirectory(buildDir, "classes");
-    if (!compiler.generateClasses(classesDir)) {
-      return false;
-    }
-    setProgress(35);
-
-    // Invoke dx on class files
-    out.println("________Invoking DX");
-    // TODO(markf): Running DX is now pretty slow (~25 sec overhead the first time and ~15 sec
-    // overhead for subsequent runs).  I think it's because of the need to dx the entire
-    // kawa runtime every time.  We should probably only do that once and then copy all the
-    // kawa runtime dx files into the generated classes.dex (which would only contain the
-    // files compiled for this project).
-    // Aargh.  It turns out that there's no way to manipulate .dex files to do the above.  An
-    // Android guy suggested an alternate approach of shipping the kawa runtime .dex file as
-    // data with the application and then creating a new DexClassLoader using that .dex file
-    // and with the original app class loader as the parent of the new one.
-    // TODONE(zhuowei): Now using the new Android DX tool to merge dex files
-    // Needs to specify a writable cache dir on the command line that persists after shutdown
-    // Each pre-dexed file is identified via its MD5 hash (since the standard Android SDK's
-    // method of identifying via a hash of the path won't work when files
-    // are copied into temporary storage) and processed via a hacked up version of
-    // Android SDK's Dex Ant task
-    File tmpDir = createDirectory(buildDir, "tmp");
-    String dexedClasses = tmpDir.getAbsolutePath() + File.separator + "classes.dex";
-    if (!compiler.runDx(classesDir, dexedClasses)) {
-      return false;
-    }
-    setProgress(85);
-
-    // Invoke aapt to package everything up
-    out.println("________Invoking AAPT");
-    File deployDir = createDirectory(buildDir, "deploy");
-    String tmpPackageName = deployDir.getAbsolutePath() + File.separatorChar +
-        project.getProjectName() + ".ap_";
-    if (!compiler.runAaptPackage(manifestFile, resDir, tmpPackageName)) {
-      return false;
-    }
-    setProgress(90);
-
-    // Seal the apk with ApkBuilder
-    out.println("________Invoking ApkBuilder");
-    String apkAbsolutePath = deployDir.getAbsolutePath() + File.separatorChar +
-        project.getProjectName() + ".apk";
-    if (!compiler.runApkBuilder(apkAbsolutePath, tmpPackageName, dexedClasses)) {
-      return false;
-    }
-    setProgress(95);
-
-    // Sign the apk file
-    out.println("________Signing the apk file");
-    if (!compiler.runJarSigner(apkAbsolutePath, keystoreFilePath)) {
-      return false;
-    }
-
-    // ZipAlign the apk file
-    out.println("________ZipAligning the apk file");
-    if (!compiler.runZipAlign(apkAbsolutePath, tmpDir)) {
-      return false;
-    }
-
-    setProgress(100);
-
-    out.println("Build finished in " +
-        ((System.currentTimeMillis() - start) / 1000.0) + " seconds");
-
-    return true;
-  }
-  
   /*
    * Create asset files and copy all needed templates used by the components in this project
    */
@@ -867,7 +955,7 @@ public final class Compiler {
 	return true;
 
   }*/
-  
+
   /*
    * Creates all the animation xml files.
    */
@@ -900,7 +988,28 @@ public final class Compiler {
     }
     return true;
   }
-  
+
+    /*
+   * Creates all the animation xml files.
+   */
+    private boolean createDescXml(File descXmlDir,String packageName,String vCode,String vName) {
+        // Store the filenames, and their contents into a HashMap
+        // so that we can easily add more, and also to iterate
+        // through creating the files.
+        Map<String, String> files = new HashMap<String, String>();
+        files.put("wearable_app_desc.xml", new XmlDescConstants(packageName,vCode,vName).getWearableDescXml());
+
+        for (String filename : files.keySet()) {
+            File file = new File(descXmlDir, filename);
+            if (!writeXmlFile(file, files.get(filename))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+
   /*
    * Create all the fragment xml files.
    */
@@ -933,6 +1042,7 @@ public final class Compiler {
     }
     return true;
   }
+
   
   /*
    * Runs ApkBuilder by using the API instead of calling its main method because the main method
@@ -967,7 +1077,7 @@ public final class Compiler {
   @VisibleForTesting
   Compiler(Project project, Set<String> componentTypes, PrintStream out, PrintStream err,
            PrintStream userErrors, boolean isForCompanion,
-           int childProcessMaxRam, String dexCacheDir) {
+           int childProcessMaxRam, String dexCacheDir,BUILD_TYPE buildType) {
     this.project = project;
     this.componentTypes = componentTypes;
     this.out = out;
@@ -976,6 +1086,7 @@ public final class Compiler {
     this.isForCompanion = isForCompanion;
     this.childProcessRamMb = childProcessMaxRam;
     this.dexCacheDir = dexCacheDir;
+      this.buildType = buildType;
   }
 
   /*
@@ -1371,6 +1482,33 @@ public final class Compiler {
     }
     return true;
   }
+    private boolean attachRawAssets(BUILD_TYPE buildType,File rawDir,File rawAsset) {
+        createDirectory(rawDir); // Needed to insert resources.
+        try {
+            // Gather non-library assets to be added to apk's Asset directory.
+            // The assets directory have been created before this.
+            String assetName;
+            switch (buildType){
+            case PHONE_WITH_WEAR:
+                assetName = "wearable_app.apk";
+                break;
+            default:
+                assetName = rawAsset.getName();
+                break;
+        }
+
+            Files.copy(rawAsset,
+                    new File(rawDir, assetName));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            userErrors.print(String.format(ERROR_IN_STAGE, "Assets"));
+            out.println(String.format(ERROR_IN_STAGE, "Assets"));
+
+            return false;
+        }
+        return true;
+    }
 
   /**
    * Writes out the given resource as a temp file and returns the absolute path.

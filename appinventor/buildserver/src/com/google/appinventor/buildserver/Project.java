@@ -251,14 +251,15 @@ public final class Project {
     return projectDir;
   }
 
-  /**
-   * Returns the location of the assets directory.
-   *
-   * @return  assets directory
-   */
-  public File getAssetsDirectory() {
-    return new File(projectDir, properties.getProperty(ASSETSTAG));
-  }
+
+    /**
+     * Returns the location of the assets directory.
+     *
+     * @return  assets directory
+     */
+    public File getAssetsDirectory() {
+        return new File(projectDir, properties.getProperty(ASSETSTAG));
+    }
 
   /**
    * Returns the location of the build output directory.

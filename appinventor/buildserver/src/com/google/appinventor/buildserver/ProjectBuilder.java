@@ -161,25 +161,41 @@ public final class ProjectBuilder {
           isForCompanion ? getAllComponentTypes() : getComponentTypes(sourceFiles);
 
         // Invoke YoungAndroid compiler
+          Compiler.BUILD_TYPE initialBuildType = Compiler.BUILD_TYPE.WEAR;
         boolean success =
             Compiler.compile(project, componentTypes, console, console, userErrors, isForCompanion,
-                             keyStorePath, childProcessRam, dexCachePath);
-        console.close();
-        userErrors.close();
+                             keyStorePath, childProcessRam, dexCachePath, initialBuildType);
 
-        // Retrieve compiler messages and convert to HTML and log
-        String srcPath = projectRoot.getAbsolutePath() + "/" + PROJECT_DIRECTORY + "/../src/";
-        String messages = processCompilerOutput(output.toString(PathUtil.DEFAULT_CHARSET),
-            srcPath);
+
+
 
         if (success) {
           // Locate output file
           File outputFile = new File(projectRoot,
               "build/deploy/" + project.getProjectName() + ".apk");
           if (!outputFile.exists()) {
+              console.close();
+              userErrors.close();
             LOG.warning("Young Android build - " + outputFile + " does not exist");
           } else {
-            outputApk = new File(outputDir, outputFile.getName());
+
+              if(initialBuildType == Compiler.BUILD_TYPE.WEAR){
+                  success =  Compiler.compile(project, componentTypes, console, console, userErrors, isForCompanion,
+                          keyStorePath, childProcessRam, dexCachePath, Compiler.BUILD_TYPE.PHONE_WITH_WEAR,new File(outputFile.getAbsolutePath()));//outputApk);
+              }
+
+              console.close();
+              userErrors.close();
+              if (success) {
+                  // Locate output file
+                  outputFile = new File(projectRoot,
+                          "build/deploy/" + project.getProjectName() + ".apk");
+                  if (!outputFile.exists()) {
+                      LOG.warning("Young Android build - " + outputFile + " does not exist");
+                  } else {
+                      outputApk = new File(outputDir, outputFile.getName());
+                  }
+              }
             Files.copy(outputFile, outputApk);
             if (saveKeystore) {
               outputKeystore = new File(outputDir, KEYSTORE_FILE_NAME);
@@ -187,6 +203,10 @@ public final class ProjectBuilder {
             }
           }
         }
+          // Retrieve compiler messages and convert to HTML and log
+          String srcPath = projectRoot.getAbsolutePath() + "/" + PROJECT_DIRECTORY + "/../src/";
+          String messages = processCompilerOutput(output.toString(PathUtil.DEFAULT_CHARSET),
+                  srcPath);
         return new Result(success, messages, errors.toString(PathUtil.DEFAULT_CHARSET));
       } finally {
         // On some platforms (OS/X), the java.io.tmpdir contains a symlink. We need to use the
@@ -239,6 +259,8 @@ public final class ProjectBuilder {
 
   private ArrayList<String> extractProjectFiles(ZipFile inputZip, File projectRoot)
       throws IOException {
+      Compiler.BUILD_TYPE buildType = Compiler.BUILD_TYPE.PHONE;
+
     ArrayList<String> projectFileNames = Lists.newArrayList();
     Enumeration<? extends ZipEntry> inputZipEnumeration = inputZip.entries();
     while (inputZipEnumeration.hasMoreElements()) {
