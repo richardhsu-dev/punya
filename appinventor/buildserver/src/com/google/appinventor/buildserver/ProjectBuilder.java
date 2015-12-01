@@ -166,7 +166,7 @@ public final class ProjectBuilder {
             Compiler.compile(project, componentTypes, console, console, userErrors, isForCompanion,
                              keyStorePath, childProcessRam, dexCachePath, initialBuildType);
 
-
+/**/
 
 
         if (success) {
