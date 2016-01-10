@@ -6,6 +6,8 @@
 
 package com.google.appinventor.components.runtime.util;
 
+import android.support.wearable.view.CircledImageView;
+import com.google.appinventor.components.annotations.UsesLibraries;
 import com.google.appinventor.components.runtime.Component;
 
 import android.graphics.drawable.Drawable;
@@ -19,6 +21,7 @@ import android.widget.TableRow;
  * Helper methods for manipulating {@link View} objects.
  *
  */
+@UsesLibraries(libraries = "android-support-wearable.jar")
 public final class ViewUtil {
 
   private ViewUtil() {
@@ -182,6 +185,16 @@ public final class ViewUtil {
     }
     view.requestLayout();
   }
+
+  /**
+   * Sets the image for an CircledImageView.
+   * @author Richard
+   */
+  public static void setImage(CircledImageView view, Drawable drawable) {
+    view.setImageDrawable(drawable);
+    view.requestLayout();
+  }
+
 
   public static void setBackgroundDrawable(View view, Drawable drawable) {
     view.setBackgroundDrawable(drawable);

@@ -155,6 +155,7 @@
 
         <pathelement location="${lib.dir}/googledrive/google-play-services.jar" />
         <pathelement location="${lib.dir}/android_support/android-support-v4.jar"/>
+        <pathelement location="${lib.dir}/android_support_wearable/android-support-wearable.jar"/>
 
         <pathelement location="${lib.dir}/funf/funf.jar" />
        <pathelement location="${lib.dir}/dropbox/dropbox-android-sdk-1.5.3.jar" />
@@ -197,6 +198,7 @@
     <!-- android.jar must go last on the classpath list
          so that its junit (or other) stubs don't override the real ones -->
     <pathelement location="${lib.dir}/android_support/android-support-v4.jar" />
+    <pathelement location="${lib.dir}/android_support_wearable/android-support-wearable.jar" />
     <pathelement location="${lib.dir}/android/4.2.2/android.jar" />
   </path>
 
@@ -285,6 +287,7 @@
           <!--<pathelement location="${lib.dir}/guava/guava-14.0.1.jar" />-->
           <pathelement location="${lib.dir}/googledrive/google-play-services.jar" />
           <pathelement location="${lib.dir}/android_support/android-support-v4.jar" />
+          <pathelement location="${lib.dir}/android_support_wearable/android-support-wearable.jar" />
           <pathelement location="${lib.dir}/funf/funf.jar" />
           <pathelement location="${lib.dir}/dropbox/dropbox-android-sdk-1.5.3.jar" />
           <pathelement location="${lib.dir}/dropbox/httpmime-4.0.3.jar" />

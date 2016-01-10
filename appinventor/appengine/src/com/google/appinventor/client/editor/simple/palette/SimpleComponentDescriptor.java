@@ -87,6 +87,7 @@ public final class SimpleComponentDescriptor {
   private static boolean imagesInitialized = false;
 
   private static void initBundledImages() {
+    //bundledImages.put("images/circledImage.png", images.)
     bundledImages.put("images/accelerometersensor.png", images.accelerometersensor());
     bundledImages.put("images/nearfield.png", images.nearfield());
     bundledImages.put("images/activityStarter.png", images.activitystarter());

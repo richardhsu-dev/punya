@@ -70,6 +70,7 @@
 
     <copy toFile="${classes.files.dir}/twitter4j.jar" file="${lib.dir}/twitter/twitter4j-core-3.0.5.jar" />
     <copy toFile="${classes.files.dir}/twitter4jmedia.jar" file="${lib.dir}/twitter/twitter4j-media-support-3.0.5.jar" />
+    <copy toFile="${classes.files.dir}/android-support-wearable.jar" file="${lib.dir}/android_support_wearable/android-support-wearable.jar" />
     <copy toFile="${classes.files.dir}/fusiontables.jar" file="${lib.dir}/fusiontables/fusiontables-v1-rev22-1.12-beta.jar" />
     <copy toFile="${classes.files.dir}/google-api-client-android2-beta.jar" file="${lib.dir}/oauth/google-api-client-android2-1.10.3-beta.jar" />
     <copy toFile="${classes.files.dir}/google-http-client-android2-beta.jar" file="${lib.dir}/oauth/google-http-client-android2-1.10.3-beta.jar" />

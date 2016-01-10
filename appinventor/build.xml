@@ -120,6 +120,7 @@
         <pathelement location="lib/jena/httpcore-4.2.2.jar" /> 
         <pathelement location="lib/twitter/twitter4j-core-3.0.5.jar" />
         <pathelement location="lib/twitter/twitter4j-media-support-3.0.5.jar" />
+        <pathelement location="lib/android_support_wearable/android-support-wearable.jar" />
 
         <pathelement location="lib/QRGenerator/core.jar" />
         <pathelement location="lib/QRGenerator/javase.jar" />

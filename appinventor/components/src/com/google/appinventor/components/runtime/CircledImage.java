@@ -7,28 +7,16 @@
 package com.google.appinventor.components.runtime;
 
 import android.graphics.drawable.Drawable;
+import android.support.wearable.view.CircledImageView;
 import android.view.View;
-import android.widget.ImageView;
 import com.google.appinventor.components.annotations.*;
 import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.common.YaVersion;
-import com.google.appinventor.components.runtime.util.ErrorMessages;
-
-import android.app.Activity;
-import android.content.ContentValues;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 import com.google.appinventor.components.runtime.util.MediaUtil;
 import com.google.appinventor.components.runtime.util.ViewUtil;
-
-import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 
 /**
  * Component for displaying circled images for Android Wear
@@ -40,9 +28,10 @@ import java.util.Date;
                 "and other aspects of the Image's appearance, can be specified in the " +
                 "Designer or in the Blocks Editor.")
 @SimpleObject
+@UsesLibraries(libraries = "android-support-wearable.jar")
 public class CircledImage extends AndroidViewComponent {
 
-    private final ImageView view;
+    private final CircledImageView view;
 
     private String picturePath = "";  // Picture property
 
@@ -53,7 +42,7 @@ public class CircledImage extends AndroidViewComponent {
      */
     public CircledImage(ComponentContainer container) {
         super(container);
-        view = new ImageView(container.$context()) {
+        view = new CircledImageView(container.$context()) {
             @Override
             public boolean verifyDrawable(Drawable dr) {
                 super.verifyDrawable(dr);
