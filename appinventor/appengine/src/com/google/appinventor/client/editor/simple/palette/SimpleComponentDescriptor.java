@@ -304,6 +304,8 @@ public final class SimpleComponentDescriptor {
       return new MockCanvas(editor);
     } else if (name.equals(MockCheckBox.TYPE)) {
       return new MockCheckBox(editor);
+    } else if (name.equals(MockCircledImage.TYPE)) {
+      return new MockCircledImage(editor);
     } else if (name.equals(MockImage.TYPE)) {
       return new MockImage(editor);
     } else if (name.equals(MockLabel.TYPE)) {
