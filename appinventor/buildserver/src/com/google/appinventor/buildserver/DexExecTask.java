@@ -185,6 +185,11 @@ public class DexExecTask  {
     }
 
     private boolean runDx(Collection<File> inputs, String output, boolean showInputs) {
+
+        if (output.contains("twitter")){
+            System.out.println("Twitter: ignore");
+            return true;
+        }
         int mx = mChildProcessRamMb - 200;
 
         List<String> commandLineList = new ArrayList<String>();
