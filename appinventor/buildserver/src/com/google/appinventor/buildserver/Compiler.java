@@ -436,7 +436,7 @@ public final class Compiler {
       // the specified SDK version.  We might also want to allow users to specify minSdkVersion
       // or have us specify higher SDK versions when the program uses a component that uses
       // features from a later SDK (e.g. Bluetooth).
-      out.write("  <uses-sdk android:minSdkVersion=\"19\" />\n");
+      out.write("  <uses-sdk android:minSdkVersion=\"20\" />\n");
 
       // If we set the targetSdkVersion to 4, we can run full size apps on tablets.
       // On non-tablet hi-res devices like a Nexus One, the screen dimensions will be the actual
@@ -1351,6 +1351,7 @@ public final class Compiler {
     // Add libraries to command line arguments
     System.out.println("Libraries needed command line n = " + librariesNeeded.size());
     for (String library : librariesNeeded) {
+      System.out.println("added library: "+library);
       inputList.add(new File(getResource(RUNTIME_FILES_DIR + library)));
     }
 
