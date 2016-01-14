@@ -52,6 +52,7 @@ public interface Component {
    * Circled Image View.
    */
   static final int CIRCLED_IMAGE_VIEW_RADIUS = 60;
+  static final int CIRCLED_IMAGE_VIEW_BORDER_WIDTH = 0;
 
   /*
    * Color constants.

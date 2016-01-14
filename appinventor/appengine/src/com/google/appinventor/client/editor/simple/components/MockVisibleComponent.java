@@ -25,6 +25,9 @@ public abstract class MockVisibleComponent extends MockComponent {
   protected static final String PROPERTY_NAME_TEXTALIGNMENT = "TextAlignment";
   protected static final String PROPERTY_NAME_BUTTONSHAPE= "Shape";
   protected static final String PROPERTY_NAME_CIRCLEDIMAGERADIUS = "Radius";
+  protected static final String PROPERTY_NAME_CIRCLEDIMAGEBORDERWIDTH = "BorderWidth";
+  protected static final String PROPERTY_NAME_CIRCLEDIMAGEBORDERCOLOR = "BorderColor";
+  protected static final String PROPERTY_NAME_CIRCLEDIMAGECIRCLECOLOR = "CircleColor";
   protected static final String PROPERTY_NAME_BACKGROUNDCOLOR = "BackgroundColor";
   protected static final String PROPERTY_NAME_BACKGROUNDIMAGE = "BackgroundImage";
   protected static final String PROPERTY_NAME_ENABLED = "Enabled";

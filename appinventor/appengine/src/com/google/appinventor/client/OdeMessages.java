@@ -2258,6 +2258,10 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("CircleColor")
   @Description("")
   String CircleColorProperties();
+
+  @DefaultMessage("BorderColor")
+  @Description("")
+  String BorderColorProperties();
   
   @DefaultMessage("BackgroundImage")
   @Description("")
@@ -2478,6 +2482,10 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("Radius")
   @Description("")
   String RadiusProperties();
+
+  @DefaultMessage("BorderWidth")
+  @Description("")
+  String BorderWidthProperties();
   
   @DefaultMessage("ReadMode")
   @Description("")

@@ -15,7 +15,6 @@ import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.common.YaVersion;
 import android.util.Log;
 import com.google.appinventor.components.runtime.util.MediaUtil;
-import com.google.appinventor.components.runtime.util.TextViewUtil;
 import com.google.appinventor.components.runtime.util.ViewUtil;
 import java.io.IOException;
 
@@ -36,7 +35,9 @@ public class CircledImage extends AndroidViewComponent {
 
     private String picturePath;  // Picture property
     private int radius;
+    private int borderWidth;
     private int circleColor;
+    private int borderColor;
 
 
     /**
@@ -57,7 +58,9 @@ public class CircledImage extends AndroidViewComponent {
         };
         picturePath = "";
         radius = Component.CIRCLED_IMAGE_VIEW_RADIUS;
-        circleColor = Component.COLOR_GREEN; // change to COLOR_DEFAULT plz
+        borderWidth = Component.CIRCLED_IMAGE_VIEW_BORDER_WIDTH;
+        circleColor = Component.COLOR_DEFAULT;
+        borderColor = Component.COLOR_DEFAULT;
 
         // Adds the component to its designated container
         container.$add(this);
@@ -89,7 +92,8 @@ public class CircledImage extends AndroidViewComponent {
      *
      * @param path  the path of the image's picture
      */
-    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ASSET,
+    @DesignerProperty(
+            editorType = PropertyTypeConstants.PROPERTY_TYPE_ASSET,
             defaultValue = "")
     @SimpleProperty
     public void Picture(String path) {
@@ -134,8 +138,8 @@ public class CircledImage extends AndroidViewComponent {
     }
 
     /**
-     * Returns the color value of the circle
-     */
+            * Returns the color value of the circle
+    */
     @SimpleProperty(
             category = PropertyCategory.APPEARANCE,
             description = "The color of the circle"
@@ -152,18 +156,72 @@ public class CircledImage extends AndroidViewComponent {
     )
     @DesignerProperty(
             editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
-            defaultValue = Component.DEFAULT_VALUE_COLOR_YELLOW
+            defaultValue = Component.DEFAULT_VALUE_COLOR_DEFAULT
     )
     public void CircleColor(int argb) {
         this.circleColor = argb;
         updateAppearance();
     }
 
+    /**
+     * Returns the color value of the border
+     */
+    @SimpleProperty(
+            category = PropertyCategory.APPEARANCE,
+            description = "The color of the border"
+    )
+    public int BorderColor() {
+        return this.borderColor;
+    }
 
-    // Update appearance based on values of radius
+    /**
+     * Sets the color of the border
+     */
+    @SimpleProperty(
+            description = "Sets the color of the border"
+    )
+    @DesignerProperty(
+            editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
+            defaultValue = Component.DEFAULT_VALUE_COLOR_DEFAULT
+    )
+    public void BorderColor(int argb) {
+        this.borderColor = argb;
+        updateAppearance();
+    }
+
+    /**
+     * Returns the width of the border
+     */
+    @SimpleProperty(
+            category = PropertyCategory.APPEARANCE,
+            description = "The width of the border"
+    )
+    public int BorderWidth() {
+        return this.borderWidth;
+    }
+
+    /**
+     * Sets the width of the border
+     */
+    @SimpleProperty(
+            description = "Sets the width of the border"
+    )
+    @DesignerProperty(
+            editorType = PropertyTypeConstants.PROPERTY_TYPE_INTEGER,
+            defaultValue = Component.CIRCLED_IMAGE_VIEW_BORDER_WIDTH + ""
+    )
+    public void BorderWidth(int borderWidth) {
+        this.borderWidth = borderWidth;
+        updateAppearance();
+    }
+
+
+    // Update appearance based on values of radius, circleColor, borderWidth, borderColor
     private void updateAppearance() {
         view.setCircleRadius(this.radius);
         view.setCircleColor(this.circleColor);
+        view.setCircleBorderWidth(this.borderWidth);
+        view.setCircleBorderColor(this.borderColor);
     }
 
 }

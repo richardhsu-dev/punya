@@ -41,12 +41,21 @@ public final class MockCircledImage extends MockImageBase {
         super.onPropertyChange(propertyName, newValue);
 
         // Apply changed properties to the mock component
-        if (propertyName.equals(PROPERTY_NAME_CIRCLEDIMAGERADIUS)){
-            super.onPropertyChange(PROPERTY_NAME_WIDTH, newValue);
-            super.onPropertyChange(PROPERTY_NAME_HEIGHT, newValue);
+        if (propertyName.equals(PROPERTY_NAME_CIRCLEDIMAGERADIUS)) {
+            //super.onPropertyChange(PROPERTY_NAME_WIDTH, newValue);
+            //super.onPropertyChange(PROPERTY_NAME_HEIGHT, newValue);
             setRadiusProperty(newValue);
             refreshForm();
         }
-    }
 
+        if (propertyName.equals(PROPERTY_NAME_CIRCLEDIMAGEBORDERCOLOR)) {
+            refreshForm();
+        }
+        if (propertyName.equals(PROPERTY_NAME_CIRCLEDIMAGECIRCLECOLOR)) {
+            refreshForm();
+        }
+        if (propertyName.equals(PROPERTY_NAME_CIRCLEDIMAGEBORDERWIDTH)) {
+            refreshForm();
+        }
+    }
 }
