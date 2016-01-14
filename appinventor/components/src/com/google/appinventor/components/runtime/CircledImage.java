@@ -107,6 +107,7 @@ public class CircledImage extends AndroidViewComponent {
      * Returns the radius of this CircledImageView
      */
     @SimpleProperty(
+            category = PropertyCategory.APPEARANCE,
             description = "The radius of this CircledImageView"
     )
     public int Radius() {
