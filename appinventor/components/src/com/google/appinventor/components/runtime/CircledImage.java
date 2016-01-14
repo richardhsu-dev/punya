@@ -36,6 +36,8 @@ public class CircledImage extends AndroidViewComponent {
 
     private String picturePath;  // Picture property
     private int radius;
+    private int circleColor;
+
 
     /**
      * Creates a new Image component.
@@ -55,6 +57,7 @@ public class CircledImage extends AndroidViewComponent {
         };
         picturePath = "";
         radius = Component.CIRCLED_IMAGE_VIEW_RADIUS;
+        circleColor = Component.COLOR_GREEN; // change to COLOR_DEFAULT plz
 
         // Adds the component to its designated container
         container.$add(this);
@@ -130,10 +133,37 @@ public class CircledImage extends AndroidViewComponent {
         updateAppearance();
     }
 
+    /**
+     * Returns the color value of the circle
+     */
+    @SimpleProperty(
+            category = PropertyCategory.APPEARANCE,
+            description = "The color of the circle"
+    )
+    public int CircleColor() {
+        return this.circleColor;
+    }
+
+    /**
+     * Sets the color of the circle
+     */
+    @SimpleProperty(
+            description = "Sets the color of the circle"
+    )
+    @DesignerProperty(
+            editorType = PropertyTypeConstants.PROPERTY_TYPE_COLOR,
+            defaultValue = Component.DEFAULT_VALUE_COLOR_YELLOW
+    )
+    public void CircleColor(int argb) {
+        this.circleColor = argb;
+        updateAppearance();
+    }
+
 
     // Update appearance based on values of radius
     private void updateAppearance() {
         view.setCircleRadius(this.radius);
+        view.setCircleColor(this.circleColor);
     }
 
 }

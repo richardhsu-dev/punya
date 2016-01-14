@@ -2254,6 +2254,10 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("BackgroundColor")
   @Description("")
   String BackgroundColorProperties();
+
+  @DefaultMessage("CircleColor")
+  @Description("")
+  String CircleColorProperties();
   
   @DefaultMessage("BackgroundImage")
   @Description("")
