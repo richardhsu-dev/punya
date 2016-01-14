@@ -14,10 +14,10 @@ import com.google.appinventor.client.editor.simple.SimpleEditor;
  */
 public final class MockCircledImage extends MockImageBase {
 
-    /**
-     * Component type name.
-     */
     public static final String TYPE = "CircledImage";
+
+    // GWT widget used to mock a Simple Button
+    private int radius;
 
     /**
      * Creates a new MockImage component.
@@ -27,4 +27,26 @@ public final class MockCircledImage extends MockImageBase {
     public MockCircledImage(SimpleEditor editor) {
         super(editor, TYPE, images.image());
     }
+
+    private void setRadiusProperty(String text){
+        this.radius = Integer.parseInt(text);
+        // do something...
+        // consider changing the width and the height simultaneously
+
+    }
+
+
+    @Override
+    public void onPropertyChange(String propertyName, String newValue) {
+        super.onPropertyChange(propertyName, newValue);
+
+        // Apply changed properties to the mock component
+        if (propertyName.equals(PROPERTY_NAME_CIRCLEDIMAGERADIUS)){
+            super.onPropertyChange(PROPERTY_NAME_WIDTH, newValue);
+            super.onPropertyChange(PROPERTY_NAME_HEIGHT, newValue);
+            setRadiusProperty(newValue);
+            refreshForm();
+        }
+    }
+
 }

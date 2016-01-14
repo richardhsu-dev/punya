@@ -15,6 +15,7 @@ import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.common.YaVersion;
 import android.util.Log;
 import com.google.appinventor.components.runtime.util.MediaUtil;
+import com.google.appinventor.components.runtime.util.TextViewUtil;
 import com.google.appinventor.components.runtime.util.ViewUtil;
 import java.io.IOException;
 
@@ -126,5 +127,13 @@ public class CircledImage extends AndroidViewComponent {
     )
     public void Radius(int radius){
         this.radius = radius;
+        updateAppearance();
     }
+
+
+    // Update appearance based on values of radius
+    private void updateAppearance() {
+        view.setCircleRadius(this.radius);
+    }
+
 }
