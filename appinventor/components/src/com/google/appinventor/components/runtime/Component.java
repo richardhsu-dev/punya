@@ -49,6 +49,11 @@ public interface Component {
   static final int BUTTON_SHAPE_OVAL = 3;
 
   /*
+   * Circled Image View.
+   */
+  static final int CIRCLED_IMAGE_VIEW_RADIUS = 60;
+
+  /*
    * Color constants.
    */
   static final int COLOR_NONE = 0x00FFFFFF;

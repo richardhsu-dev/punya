@@ -33,7 +33,8 @@ public class CircledImage extends AndroidViewComponent {
 
     private final CircledImageView view;
 
-    private String picturePath = "";  // Picture property
+    private String picturePath;  // Picture property
+    private int radius;
 
     /**
      * Creates a new Image component.
@@ -42,6 +43,7 @@ public class CircledImage extends AndroidViewComponent {
      */
     public CircledImage(ComponentContainer container) {
         super(container);
+
         view = new CircledImageView(container.$context()) {
             @Override
             public boolean verifyDrawable(Drawable dr) {
@@ -50,6 +52,8 @@ public class CircledImage extends AndroidViewComponent {
                 return true;
             }
         };
+        picturePath = "";
+        radius = Component.CIRCLED_IMAGE_VIEW_RADIUS;
 
         // Adds the component to its designated container
         container.$add(this);
@@ -98,4 +102,28 @@ public class CircledImage extends AndroidViewComponent {
         ViewUtil.setImage(view, drawable);
     }
 
+
+    /**
+     * Returns the radius of this CircledImageView
+     */
+    @SimpleProperty(
+            description = "The radius of this CircledImageView"
+    )
+    public int Radius() {
+        return this.radius;
+    }
+
+    /**
+     * Sets the radius of this CircledImageView
+     */
+    @SimpleProperty(
+            description = "Sets the radius of this CircledImageView"
+    )
+    @DesignerProperty(
+            editorType = PropertyTypeConstants.PROPERTY_TYPE_INTEGER,
+            defaultValue = Component.CIRCLED_IMAGE_VIEW_RADIUS + ""
+    )
+    public void Radius(int radius){
+        this.radius = radius;
+    }
 }
