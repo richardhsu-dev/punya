@@ -38,7 +38,7 @@ public class CircledImage extends AndroidViewComponent {
     private int borderWidth;
     private int circleColor;
     private int borderColor;
-    private boolean showIndeterminateProgress;
+    private boolean showIndeterminateProgress = true;
 
 
     /**
@@ -57,12 +57,12 @@ public class CircledImage extends AndroidViewComponent {
                 return true;
             }
         };
-        picturePath = "";
-        radius = Component.CIRCLED_IMAGE_VIEW_RADIUS;
-        borderWidth = Component.CIRCLED_IMAGE_VIEW_BORDER_WIDTH;
-        circleColor = Component.COLOR_DEFAULT;
-        borderColor = Component.COLOR_DEFAULT;
-        showIndeterminateProgress = true;
+        this.picturePath = "";
+        this.radius = Component.CIRCLED_IMAGE_VIEW_RADIUS;
+        this.borderWidth = Component.CIRCLED_IMAGE_VIEW_BORDER_WIDTH;
+        this.circleColor = Component.COLOR_DEFAULT;
+        this.borderColor = Component.COLOR_DEFAULT;
+        this.showIndeterminateProgress = true;
 
         // Adds the component to its designated container
         container.$add(this);
@@ -236,7 +236,7 @@ public class CircledImage extends AndroidViewComponent {
     )
     @DesignerProperty(
             editorType = PropertyTypeConstants.PROPERTY_TYPE_BOOLEAN,
-            defaultValue = true + ""
+            defaultValue = "True"
     )
     public void ShowIndeterminateProgress(boolean showIndeterminateProgress) {
         this.showIndeterminateProgress = showIndeterminateProgress;
