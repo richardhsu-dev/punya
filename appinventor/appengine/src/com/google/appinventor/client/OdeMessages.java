@@ -2262,6 +2262,10 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("BorderColor")
   @Description("")
   String BorderColorProperties();
+
+  @DefaultMessage("ShowIndeterminateProgress")
+  @Description("")
+  String ShowIndeterminateProgressProperties();
   
   @DefaultMessage("BackgroundImage")
   @Description("")

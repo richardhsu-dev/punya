@@ -142,6 +142,14 @@ public class TranslationDesignerProperties {
       value = MESSAGES.QueryProperties();
     } else if (key.equals("Radius")) {
       value = MESSAGES.RadiusProperties();
+    } else if (key.equals("CircleColor")) {
+      value = MESSAGES.CircleColorProperties();
+    } else if (key.equals("BorderWidth")) {
+      value = MESSAGES.BorderWidthProperties();
+    } else if (key.equals("BorderColor")) {
+      value = MESSAGES.BorderColorProperties();
+    } else if (key.equals("ShowIndeterminateProgress")) {
+      value = MESSAGES.ShowIndeterminateProgressProperties();
     } else if (key.equals("ReadMode")) {
       value = MESSAGES.ReadModeProperties();
     } else if (key.equals("ReceivingEnabled")) {
