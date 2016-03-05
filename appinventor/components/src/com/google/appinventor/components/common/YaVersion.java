@@ -624,6 +624,7 @@ public class YaVersion {
   public static final int IMAGE_COMPONENT_VERSION = 1;
 
   public static final int CIRCLED_IMAGE_COMPONENT_VERSION = 1;
+  public static final int CARD_FRAGMENT_COMPONENT_VERSION = 1;
 
   // For IMAGEPICKER_COMPONENT_VERSION 2:
   // - The Alignment property was renamed to TextAlignment.

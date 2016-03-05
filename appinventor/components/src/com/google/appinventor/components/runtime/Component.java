@@ -55,6 +55,11 @@ public interface Component {
   static final int CIRCLED_IMAGE_VIEW_BORDER_WIDTH = 0;
 
   /*
+  * Card Fragment
+   */
+  static final String CARD_FRAGMENT_TITLE = "Default Title";
+
+  /*
    * Color constants.
    */
   static final int COLOR_NONE = 0x00FFFFFF;

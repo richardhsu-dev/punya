@@ -152,6 +152,7 @@ public class TranslationComponentProperty {
     map.put("BorderColor", MESSAGES.BorderColorProperties());
     map.put("ShowIndeterminateProgress", MESSAGES.ShowIndeterminateProgressProperties());
     map.put("BorderWidth", MESSAGES.BorderWidthProperties());
+    map.put("CardTitle", MESSAGES.CardTitleProperties());
     map.put("ReceivingEnabled", MESSAGES.ReceivingEnabledProperties());
     map.put("ReleasedEventEnabled", MESSAGES.ReleasedEventEnabledProperties());
     map.put("ResponseFileName", MESSAGES.ResponseFileNameProperties());

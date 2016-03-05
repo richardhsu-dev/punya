@@ -2490,6 +2490,10 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("BorderWidth")
   @Description("")
   String BorderWidthProperties();
+
+  @DefaultMessage("CardTitle")
+  @Description("")
+  String CardTitleProperties();
   
   @DefaultMessage("ReadMode")
   @Description("")
