@@ -29,7 +29,8 @@ public class CardFragment extends AndroidViewComponent{
     private String description = "..."; // TODO(richard) - take out
     private int iconResource = 0; // TODO(richard) - take out
     public final String TAG = "CardFragment";
-    private final Activity context;
+    private Activity context;
+    private Form form;
     private android.widget.FrameLayout viewLayout;
     private FragmentManager fragmentManager;
     private final Handler androidUIHandler = new Handler();
@@ -40,28 +41,17 @@ public class CardFragment extends AndroidViewComponent{
         super(container);
         cardFragmentObject = android.support.wearable.view.CardFragment.create(title, description);
         context = container.$context();
+        form = container.$form();
         Log.i(TAG, "In the constructor of CardFragment.java");
         viewLayout = new android.widget.FrameLayout(context);
-        fragmentManager = context.getFragmentManager();
+        //fragmentManager = context.getFragmentManager();
 
-        androidUIHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                boolean dispatchEventNow = false;
-                if (viewLayout != null){
-                    dispatchEventNow = true;
-                }
-                if (dispatchEventNow){
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.add(viewLayout.getId(), cardFragmentObject);
-                    fragmentTransaction.commit();
-                } else {
-                    // try again later
-                    androidUIHandler.post(this);
-                }
-            }
-        });
+        FragmentTransaction fragmentTransaction = form.getFragmentManager().beginTransaction();
+        fragmentTransaction.replace(viewLayout.getId(), cardFragmentObject);
+        fragmentTransaction.commit();
 
+        // Adds the component to its designated container
+        container.$add(this);
 
         // TODO(richard) - use setArgument to dynamically change the title, desc, and icon based on Punya user input
 
