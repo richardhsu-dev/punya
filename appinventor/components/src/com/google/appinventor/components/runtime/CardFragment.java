@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import com.google.appinventor.components.annotations.*;
@@ -31,6 +32,8 @@ public class CardFragment extends AndroidViewComponent{
     private final Activity context;
     private android.widget.FrameLayout viewLayout;
     private FragmentManager fragmentManager;
+    private final Handler androidUIHandler = new Handler();
+
 
 
     public CardFragment(ComponentContainer container) {
@@ -40,12 +43,27 @@ public class CardFragment extends AndroidViewComponent{
         Log.i(TAG, "In the constructor of CardFragment.java");
         viewLayout = new android.widget.FrameLayout(context);
         fragmentManager = context.getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        androidUIHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                boolean dispatchEventNow = false;
+                if (viewLayout != null){
+                    dispatchEventNow = true;
+                }
+                if (dispatchEventNow){
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.add(viewLayout.getId(), cardFragmentObject);
+                    fragmentTransaction.commit();
+                } else {
+                    // try again later
+                    androidUIHandler.post(this);
+                }
+            }
+        });
+
 
         // TODO(richard) - use setArgument to dynamically change the title, desc, and icon based on Punya user input
-
-        fragmentTransaction.add(viewLayout.getId(), cardFragmentObject);
-        fragmentTransaction.commit();
 
 
     }

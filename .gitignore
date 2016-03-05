@@ -1,0 +1,25 @@
+.idea/
+appinventor/.idea/
+appinventor/aimerger/aimerger.iml
+appinventor/aimerger_for_appinv_classic/aimerger_for_appinv_classic.iml
+appinventor/appengine/appengine.iml
+appinventor/appengine/build/
+appinventor/blocklyeditor/blocklyeditor.iml
+appinventor/blockslib/blockslib.iml
+appinventor/build/
+appinventor/buildserver/build/
+appinventor/buildserver/buildserver.iml
+appinventor/buildserver/playapp.txt
+appinventor/buildserver/playappLOG-2.txt
+appinventor/buildserver/playappLOG-3.txt
+appinventor/buildserver/playappLOG.txt
+appinventor/common/build/
+appinventor/common/common.iml
+appinventor/components/build/
+appinventor/components/components.iml
+appinventor/lib/android/tools/dx-old.jar
+appinventor/lib/android/tools/xxx.dex
+appinventor/lib/android/tools/xxx.jar
+appinventor/lib/android_support/android-support-v4 copy/
+appinventor/log.txt
+
