@@ -2,7 +2,6 @@ package com.google.appinventor.components.runtime;
 
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Handler;
@@ -12,6 +11,7 @@ import com.google.appinventor.components.annotations.*;
 import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.common.YaVersion;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Component for constructing a CardFragment for Android Wear
@@ -23,14 +23,17 @@ import com.google.appinventor.components.common.YaVersion;
 @SimpleObject
 @UsesLibraries(libraries = "android-support-wearable.jar")
 public class CardFragment extends AndroidViewComponent{
+    private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
 
-    private android.support.wearable.view.CardFragment cardFragmentObject;
+    private android.support.wearable.view.CardFragment mCardFragment;
     private String title;
     private String description = "..."; // TODO(richard) - take out
     private int iconResource = 0; // TODO(richard) - take out
     public final String TAG = "CardFragment";
     private Activity context;
     private Form form;
+//    private android.support.wearable.view.WearableFrameLayout viewLayout;
+//    private FrameLayout viewLayout;
     private android.widget.FrameLayout viewLayout;
     private FragmentManager fragmentManager;
     private final Handler androidUIHandler = new Handler();
@@ -39,15 +42,17 @@ public class CardFragment extends AndroidViewComponent{
 
     public CardFragment(ComponentContainer container) {
         super(container);
-        cardFragmentObject = android.support.wearable.view.CardFragment.create(title, description);
+        mCardFragment = android.support.wearable.view.CardFragment.create(title, description);
         context = container.$context();
         form = container.$form();
         Log.i(TAG, "In the constructor of CardFragment.java");
+        //viewLayout = new android.support.wearable.view.WearableFrameLayout(context);
         viewLayout = new android.widget.FrameLayout(context);
-        //fragmentManager = context.getFragmentManager();
+        viewLayout.setId(View.generateViewId());
+        fragmentManager = context.getFragmentManager();
 
         FragmentTransaction fragmentTransaction = form.getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(viewLayout.getId(), cardFragmentObject);
+        fragmentTransaction.add(viewLayout.getId(), mCardFragment);
         fragmentTransaction.commit();
 
         // Adds the component to its designated container
@@ -91,5 +96,23 @@ public class CardFragment extends AndroidViewComponent{
 
     private void updateAppearance() {
         // to be written ...
+    }
+
+    /**
+     * Generate a value suitable for use in .
+     * This value will not collide with ID values generated at build time by aapt for R.id.
+     *
+     * @return a generated ID value
+     */
+    private static int generateViewId() {
+        for (;;) {
+            final int result = sNextGeneratedId.get();
+            // aapt-generated IDs have the high byte nonzero; clamp to the range under that.
+            int newValue = result + 1;
+            if (newValue > 0x00FFFFFF) newValue = 1; // Roll over to 1, not 0.
+            if (sNextGeneratedId.compareAndSet(result, newValue)) {
+                return result;
+            }
+        }
     }
 }

@@ -5,7 +5,7 @@ import com.google.appinventor.client.editor.simple.SimpleEditor;
 /**
  * Created by Richard on 3/5/16.
  */
-public class MockCardFragment extends MockVisibleComponent{
+public class MockCardFragment extends MockImageBase{
     public static final String TYPE = "CardFragment";
     public MockCardFragment(SimpleEditor editor) {
         super(editor, TYPE, images.image());
